@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/layoutItem"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingBottom="1dp"
+    android:orientation="vertical">
+
+    <RelativeLayout
+        android:background="#444"
+        android:layout_width="match_parent"
+        android:layout_height="220dp"
+        android:padding="10dp">
+
+        <ImageView
+            android:scaleType="fitXY"
+            android:id="@+id/thumbnailImageLayout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:contentDescription="@string/app_name" />
+
+        <TextView
+            android:id="@+id/video_duration"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentBottom="true"
+            android:background="#000"
+            android:padding="5dp"
+            android:text="00:00"
+            android:textColor="#fff"
+            tools:ignore="HardcodedText" />
+
+    </RelativeLayout>
+
+    <LinearLayout
+        android:background="#444"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="3dp"
+        android:weightSum="100">
+
+        <TextView
+            android:id="@+id/video_title"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="92"
+            android:ellipsize="marquee"
+            android:gravity="center_vertical"
+            android:marqueeRepeatLimit="marquee_forever"
+            android:paddingVertical="10dp"
+            android:paddingStart="2dp"
+            android:singleLine="true"
+            android:text="Video Name"
+            android:textColor="#fff"
+            android:textSize="16sp"
+            tools:ignore="HardcodedText,RtlSymmetry,UnusedAttribute" />
+
+        <ImageView
+            android:id="@+id/thumbnailThreeDots"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="8"
+            android:contentDescription="@string/app_name"
+            android:paddingVertical="10dp"
+            android:src="@drawable/options"
+            tools:ignore="UnusedAttribute" />
+
+    </LinearLayout>
+
+</LinearLayout>
