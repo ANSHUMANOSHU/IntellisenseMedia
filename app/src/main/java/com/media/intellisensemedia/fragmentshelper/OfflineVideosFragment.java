@@ -1,4 +1,4 @@
-package com.media.intellisensemedia.Fragments;
+package com.media.intellisensemedia.fragmentshelper;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -9,13 +9,12 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.media.intellisensemedia.Adapters.OfflineVideosAdapter;
-import com.media.intellisensemedia.EntityClasses.Video;
-import com.media.intellisensemedia.Helpers.VideoFetcher;
+import com.media.intellisensemedia.adapters.OfflineVideosAdapter;
+import com.media.intellisensemedia.entitiy.Video;
+import com.media.intellisensemedia.utils.VideoFetcher;
 import com.media.intellisensemedia.R;
 
 import java.util.ArrayList;

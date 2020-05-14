@@ -1,11 +1,14 @@
-package com.media.intellisensemedia.Helpers;
+package com.media.intellisensemedia.utils;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 import android.provider.MediaStore;
-import com.media.intellisensemedia.EntityClasses.Video;
+
+import com.media.intellisensemedia.entitiy.Video;
+
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashSet;
 
@@ -44,6 +47,17 @@ public class VideoFetcher {
         int minutes = temp / 60;
         int seconds = temp % 60;
         return String.format("%02d : %02d", minutes, seconds);
+    }
+
+    @SuppressLint("InlinedApi")
+    public static Video getVideo(Context context, String Data) {
+        ArrayList<Video> arrayList = fetchAllVideos(context);
+        for(Video video : arrayList){
+            if(video.DATA.toLowerCase().equals(Data.toLowerCase())){
+                return video;
+            }
+        }
+        return null;
     }
 
 }

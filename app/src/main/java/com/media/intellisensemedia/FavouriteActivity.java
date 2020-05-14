@@ -8,9 +8,9 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
 
-import com.media.intellisensemedia.Adapters.OfflineVideosAdapter;
-import com.media.intellisensemedia.DatabaseHelpers.DatabaseHelper;
-import com.media.intellisensemedia.EntityClasses.Video;
+import com.media.intellisensemedia.adapters.OfflineVideosAdapter;
+import com.media.intellisensemedia.dbhelpers.FavouriteHelper;
+import com.media.intellisensemedia.entitiy.Video;
 
 import java.util.ArrayList;
 
@@ -38,8 +38,8 @@ public class FavouriteActivity extends AppCompatActivity {
         recyclerView.setAdapter(adapter);
 
         //  F E T C H   A L L   F A V O U R I T E   V I D E O S   A N D   S E T   T O   R E C Y C L E R   V I E W   L I S T
-        DatabaseHelper databaseHelper = new DatabaseHelper(this);
-        favouriteVideos = databaseHelper.fetchAllFavourites();
+        FavouriteHelper favouriteHelper = new FavouriteHelper(this);
+        favouriteVideos = favouriteHelper.fetchAll();
 
         //  C H E C K   I F   F A V O U R I T E S   A R E   E M PT Y
         if (favouriteVideos.isEmpty()) {

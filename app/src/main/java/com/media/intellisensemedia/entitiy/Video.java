@@ -1,11 +1,10 @@
-package com.media.intellisensemedia.EntityClasses;
+package com.media.intellisensemedia.entitiy;
 
 public class Video {
 
     public String DATA;
     public String DISPLAYNAME;
     public String LENGTH;
-    public boolean STATUS_ADDED = false;
 
     public Video() {
     }
