@@ -5,10 +5,14 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+
+import com.google.android.exoplayer2.C;
 import com.media.intellisensemedia.entitiy.Playlist;
 import com.media.intellisensemedia.entitiy.Video;
 import com.media.intellisensemedia.utils.VideoFetcher;
+
 import java.util.ArrayList;
+
 import androidx.annotation.Nullable;
 
 public class PlayListHelper extends SQLiteOpenHelper {
@@ -37,19 +41,48 @@ public class PlayListHelper extends SQLiteOpenHelper {
         onCreate(db);
     }
 
-    public void addPlaylist(Playlist playlist){
-        String SQL = "create table "+playlist.tname+" ("+T_COLUMN+" text PRIMARY KEY);";
+    public void addPlaylist(Playlist playlist) {
         SQLiteDatabase database = getWritableDatabase();
+        String SQL = "create table " + playlist.tname + " ( " + T_COLUMN + " text PRIMARY KEY);";
         database.execSQL(SQL);
+        ContentValues values = new ContentValues();
+        values.put(COLUMN_1,playlist.dname);
+        values.put(COLUMN_2,playlist.tname);
+        database.insert(TABLE_NAME,null,values);
+
         database.close();
     }
 
-    public boolean insertVideo(Playlist playlist,Video video) {
-        if (!exists(playlist,video)) {
+    public ArrayList<Playlist> fetchAllPlaylist() {
+        ArrayList<Playlist> list = new ArrayList<>();
+        SQLiteDatabase database = getReadableDatabase();
+        try {
+            Cursor cursor = database.rawQuery("Select * from " + TABLE_NAME, null);
+            if (cursor != null) {
+                Playlist playlist;
+                while (cursor.moveToNext()) {
+                    playlist = new Playlist();
+                    playlist.dname = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_1));
+                    playlist.tname = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_2));
+                    list.add(playlist);
+                }
+                cursor.close();
+                return list;
+            }
+
+        } catch (Exception e) {
+        } finally {
+            database.close();
+        }
+        return list;
+    }
+
+    public boolean insertVideo(Playlist playlist, Video video) {
+        if (!exists(playlist, video)) {
             SQLiteDatabase database = getWritableDatabase();
             ContentValues contentValues = new ContentValues();
-            contentValues.put(T_COLUMN,video.DATA);
-            database.insert(playlist.tname,null,contentValues);
+            contentValues.put(T_COLUMN, video.DATA);
+            database.insert(playlist.tname, null, contentValues);
             database.close();
             return true;
         }
@@ -57,7 +90,16 @@ public class PlayListHelper extends SQLiteOpenHelper {
     }
 
     public boolean exists(Playlist playlist, Video video) {
-        //TODO :
+        SQLiteDatabase database = getReadableDatabase();
+        Cursor cursor = database.rawQuery("Select * from " + playlist.tname + " where " + T_COLUMN
+                + " = \"" + video.DATA + "\"", null);
+        if (cursor != null) {
+            if (cursor.moveToNext()) {
+                database.close();
+                return true;
+            }
+        }
+        database.close();
         return false;
     }
 
@@ -75,7 +117,7 @@ public class PlayListHelper extends SQLiteOpenHelper {
                     if (video != null) {
                         videos.add(video);
                     } else {
-                        delete(playlist,video);
+                        delete(playlist, video);
                     }
                 }
                 cursor.close();
@@ -92,7 +134,7 @@ public class PlayListHelper extends SQLiteOpenHelper {
         //TODO :
     }
 
-    public void delete(Playlist playlist,Video video) {
+    public void delete(Playlist playlist, Video video) {
         SQLiteDatabase database = getWritableDatabase();
         database.delete(playlist.tname, T_COLUMN + " = ?", new String[]{video.DATA});
         database.close();
