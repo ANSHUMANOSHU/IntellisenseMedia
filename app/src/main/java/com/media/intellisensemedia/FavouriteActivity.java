@@ -20,7 +20,7 @@ public class FavouriteActivity extends AppCompatActivity {
     private RecyclerView recyclerView;
     public TextView sorryText;
     private OfflineVideosAdapter adapter;
-    private static final String ACTIVITY = "FAVOURITE";
+    public static final String ACTIVITY = "FAVOURITE";
 
 
     @Override

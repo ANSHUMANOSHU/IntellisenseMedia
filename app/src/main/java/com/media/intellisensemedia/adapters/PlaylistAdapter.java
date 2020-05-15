@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.media.intellisensemedia.PlaylistVideosActivity;
 import com.media.intellisensemedia.R;
+import com.media.intellisensemedia.dbhelpers.PlayListHelper;
 import com.media.intellisensemedia.entitiy.Playlist;
 
 import java.util.ArrayList;
@@ -21,6 +22,7 @@ public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.ViewHo
 
     private Context context;
     private ArrayList<Playlist> playlists = new ArrayList<>();
+    private PlayListHelper playListHelper;
 
 
     public PlaylistAdapter(Context context) {
@@ -50,7 +52,10 @@ public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.ViewHo
         holder.deleteIcon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                playListHelper = new PlayListHelper(context);
+                playListHelper.delete(playlists.get(position));
+                playlists.clear();
+                setPlaylists(playListHelper.fetchAllPlaylist());
             }
         });
 
@@ -61,7 +66,7 @@ public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.ViewHo
         return playlists.size();
     }
 
-    class ViewHolder extends RecyclerView.ViewHolder{
+     class ViewHolder extends RecyclerView.ViewHolder{
         ImageView deleteIcon;
         TextView displayName;
 

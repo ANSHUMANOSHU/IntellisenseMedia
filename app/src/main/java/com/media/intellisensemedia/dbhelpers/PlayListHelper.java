@@ -46,9 +46,9 @@ public class PlayListHelper extends SQLiteOpenHelper {
         String SQL = "create table " + playlist.tname + " ( " + T_COLUMN + " text PRIMARY KEY);";
         database.execSQL(SQL);
         ContentValues values = new ContentValues();
-        values.put(COLUMN_1,playlist.dname);
-        values.put(COLUMN_2,playlist.tname);
-        database.insert(TABLE_NAME,null,values);
+        values.put(COLUMN_1, playlist.dname);
+        values.put(COLUMN_2, playlist.tname);
+        database.insert(TABLE_NAME, null, values);
 
         database.close();
     }
@@ -131,7 +131,18 @@ public class PlayListHelper extends SQLiteOpenHelper {
     }
 
     public void delete(Playlist playlist) {
-        //TODO :
+        SQLiteDatabase database = getWritableDatabase();
+        try {
+            //  R E M O V E   E N T R Y    F R O M    M AS T E R    T A B L E
+            database.delete(TABLE_NAME, COLUMN_2 + " = ?", new String[]{playlist.tname});
+
+            //  R E M O V E   T A B L E
+            database.execSQL("Drop table if exists " + playlist.tname);
+
+        } catch (Exception e) {
+        } finally {
+            database.close();
+        }
     }
 
     public void delete(Playlist playlist, Video video) {

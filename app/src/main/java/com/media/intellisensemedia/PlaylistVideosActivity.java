@@ -19,9 +19,10 @@ public class PlaylistVideosActivity extends AppCompatActivity {
 
     private RecyclerView recyclerView;
     private OfflineVideosAdapter adapter;
-    private TextView sorryText;
-    private static final String ACTIVITY = "VIDEOSPLAYLIST";
+    public TextView sorryText;
+    public static final String ACTIVITY = "VIDEOSPLAYLIST";
     public static final String  PLAYLIST = "PLAYLIST";
+    public static Playlist PLAYLIST_NAME;
     private PlayListHelper playListHelper;
 
     private ArrayList<Video> videos;
@@ -42,12 +43,14 @@ public class PlaylistVideosActivity extends AppCompatActivity {
 
         //   F E T C H   A L L   V I D E O S    F R O M    P L A Y L I S T
         playListHelper = new PlayListHelper(this);
-        Playlist playlist = (Playlist) getIntent().getSerializableExtra(PLAYLIST);
-        playlist = playListHelper.fetchAll(playlist);
-        if (playlist.videos.isEmpty())
+
+        PLAYLIST_NAME = (Playlist) getIntent().getSerializableExtra(PLAYLIST);
+        PLAYLIST_NAME = playListHelper.fetchAll(PLAYLIST_NAME);
+
+        if (PLAYLIST_NAME.videos.isEmpty())
             sorryText.setVisibility(View.VISIBLE);
         else
-            adapter.setVideos(playlist.videos);
-        
+            adapter.setVideos(PLAYLIST_NAME.videos);
+
     }
 }
