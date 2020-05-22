@@ -22,9 +22,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
-        <activity android:name=".PlaylistVideosActivity"></activity>
-        <activity android:name=".PlayListActivity" />
-        <activity android:name=".FavouriteActivity" />
+        <activity android:name=".FavouriteActivity"></activity>
         <activity
             android:name=".ExoplayerActivity"
             android:screenOrientation="landscape" />

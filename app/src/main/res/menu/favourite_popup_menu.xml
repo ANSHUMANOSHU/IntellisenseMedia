@@ -3,8 +3,8 @@
     xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
-        android:title="Remove Video"
-        android:id="@+id/removeVideo"
+        android:title="Remove from Favourites"
+        android:id="@+id/removeFavourite"
         tools:ignore="HardcodedText" />
 
 </menu>
