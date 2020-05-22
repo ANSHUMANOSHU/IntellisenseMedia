@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -7,6 +7,12 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity"
     android:orientation="vertical">
+
+    <org.opencv.android.JavaCameraView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/camera"
+        android:layout_centerInParent="true"/>
 
 
     <com.google.android.exoplayer2.ui.PlayerView
@@ -20,4 +26,4 @@
         app:show_timeout="45000"
         app:surface_type="texture_view"/>
 
-</LinearLayout>
+</RelativeLayout>

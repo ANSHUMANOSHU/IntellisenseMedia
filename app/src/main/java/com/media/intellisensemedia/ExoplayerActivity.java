@@ -1,14 +1,12 @@
 package com.media.intellisensemedia;
 
 import androidx.appcompat.app.AppCompatActivity;
-
-import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.Window;
 import android.view.WindowManager;
-
+import android.widget.Toast;
 import com.google.android.exoplayer2.DefaultLoadControl;
 import com.google.android.exoplayer2.ExoPlaybackException;
 import com.google.android.exoplayer2.ExoPlayerFactory;
@@ -32,15 +30,69 @@ import com.google.android.exoplayer2.upstream.DefaultAllocator;
 import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter;
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
 import com.google.android.exoplayer2.util.Util;
+import org.opencv.android.BaseLoaderCallback;
+import org.opencv.android.CameraBridgeViewBase;
+import org.opencv.android.JavaCameraView;
+import org.opencv.android.LoaderCallbackInterface;
+import org.opencv.android.OpenCVLoader;
+import org.opencv.core.Core;
+import org.opencv.core.Mat;
+import org.opencv.core.MatOfRect;
+import org.opencv.objdetect.CascadeClassifier;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
 
-public class ExoplayerActivity extends AppCompatActivity implements Player.EventListener {
+public class ExoplayerActivity extends AppCompatActivity
+        implements Player.EventListener , CameraBridgeViewBase.CvCameraViewListener2 {
 
     private static final String VIDEO_URI = "VIDEOURI";
-
     PlayerView playerView;
     SimpleExoPlayer player;
     Handler mHandler;
     Runnable mRunnable;
+    JavaCameraView javaCameraView;
+    File cascadeFile;
+    CascadeClassifier cascadeClassifier;
+    Mat mat;
+
+    BaseLoaderCallback baseLoaderCallback = new BaseLoaderCallback(this) {
+        @Override
+        public void onManagerConnected(int status) {
+
+            if (status == LoaderCallbackInterface.SUCCESS) {
+
+                InputStream is = getResources().openRawResource(R.raw.haarcascade_frontalface_alt2);
+                File file = getDir("cascade", MODE_PRIVATE);
+
+                cascadeFile = new File(file, "haarcascade_frontalface_alt2.xml");
+
+                try {
+                    FileOutputStream fos = new FileOutputStream(cascadeFile.getAbsolutePath());
+                    byte[] data = new byte[4096];  //4096(4 MBPS) TRANSFER SPEED PER CLOCK
+                    //x64 -> 1024 -- 65536
+                    //x86/x32 -> 512  --  32768
+                    int bytes;
+                    while ((bytes = is.read(data)) != -1) {
+                        fos.write(data, 0, bytes);
+                    }
+                    is.close();
+                    fos.close();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                cascadeClassifier = new CascadeClassifier(cascadeFile.getAbsolutePath());
+                if (cascadeClassifier.empty()) {
+                    cascadeClassifier = null;
+                } else {
+                    cascadeFile.delete();
+                }
+                javaCameraView.enableView();
+            } else {
+                super.onManagerConnected(status);
+            }
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,6 +110,20 @@ public class ExoplayerActivity extends AppCompatActivity implements Player.Event
         //I N I T I A L I Z E   P L A Y E R    V I E W
         playerView = findViewById(R.id.videoFullScreenPlayer);
 
+        //I N I T I A L I Z E   C A M E R A    V I E W
+        javaCameraView = findViewById(R.id.camera);
+
+        //C H E C K    O P E N C V    S T A T U S
+        if (OpenCVLoader.initDebug()) {
+            baseLoaderCallback.onManagerConnected(LoaderCallbackInterface.SUCCESS);
+        } else {
+            Toast.makeText(this, "Error Loading OpenCV...", Toast.LENGTH_SHORT).show();
+            OpenCVLoader.initAsync(OpenCVLoader.OPENCV_VERSION_3_0_0, this, baseLoaderCallback);
+        }
+
+        // L O A D   F R O N T   C A M E R A   A N D   C A M E R A   E V E N T   L I S T E N E R
+        javaCameraView.setCameraIndex(1);
+        javaCameraView.setCvCameraViewListener(this);
 
         //  S E T U P    P L A Y E R
         setUp(getIntent().getStringExtra(VIDEO_URI));
@@ -174,6 +240,39 @@ public class ExoplayerActivity extends AppCompatActivity implements Player.Event
     }
     @Override
     public void onSeekProcessed() {
+    }
+
+    @Override
+    public void onCameraViewStarted(int width, int height) {
+        mat = new Mat();
+    }
+
+    @Override
+    public void onCameraViewStopped() {
+        mat.release();
+    }
+
+    @Override
+    public Mat onCameraFrame(CameraBridgeViewBase.CvCameraViewFrame inputFrame) {
+        mat = inputFrame.rgba();
+        MatOfRect matOfRect = new MatOfRect();
+        cascadeClassifier.detectMultiScale(mat, matOfRect);
+        if(player!=null && player.getPlaybackState() == Player.STATE_READY && matOfRect.toArray().length == 0){
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    player.setPlayWhenReady(false);
+                }
+            });
+        }else if(player!=null && matOfRect.toArray().length > 0){
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    player.setPlayWhenReady(true);
+                }
+            });
+        }
+        return null;
     }
 
 
