@@ -24,7 +24,7 @@ public class OfflineVideosFragment extends Fragment {
     private RecyclerView recyclerView;
     private ArrayList<Video> videos;
     private OfflineVideosAdapter adapter;
-    private static final String ACTIVITY = "OFFLINE";
+    public static final String ACTIVITY = "OFFLINE";
     private TextView sorryText;
 
     @Nullable

@@ -89,6 +89,8 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
                 startActivity(intent);
                 break;
             case R.id.playlists:
+                Intent intent1 = new Intent(this,PlayListActivity.class);
+                startActivity(intent1);
                 break;
         }
         return super.onOptionsItemSelected(item);

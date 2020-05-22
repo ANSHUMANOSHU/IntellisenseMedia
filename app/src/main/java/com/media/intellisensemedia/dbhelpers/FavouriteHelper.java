@@ -55,10 +55,12 @@ public class FavouriteHelper extends SQLiteOpenHelper {
         if(cursor!=null){
             if(cursor.moveToNext()) {
                 cursor.close();
+                database.close();
                 return true;
             }else
                 cursor.close();
         }
+        database.close();
         return false;
     }
 
