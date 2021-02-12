@@ -10,11 +10,17 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.media.intellisensemedia.dbhelpers.FavouriteHelper;
 import com.media.intellisensemedia.entitiy.Video;
 import com.media.intellisensemedia.fragmentshelper.OfflineVideosFragment;
+import com.media.intellisensemedia.fragmentshelper.OnlineVideosFragment;
 
 public class MainActivity extends AppCompatActivity implements BottomNavigationView.OnNavigationItemSelectedListener {
 
@@ -46,6 +52,8 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         switch (item.getItemId()) {
             case R.id.bottom_videos:
+                transaction.replace(R.id.frame_container, new OnlineVideosFragment());
+                transaction.commit();
                 break;
             case R.id.bottom_movies:
                 break;

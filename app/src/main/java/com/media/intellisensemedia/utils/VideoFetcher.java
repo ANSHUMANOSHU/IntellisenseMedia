@@ -5,10 +5,18 @@ import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 import android.provider.MediaStore;
+import android.util.Log;
 
+import androidx.annotation.NonNull;
+
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.media.intellisensemedia.entitiy.Video;
+import com.media.intellisensemedia.interfaces.OnFetchedListener;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.HashSet;
 
@@ -28,7 +36,7 @@ public class VideoFetcher {
                     Video video = new Video();
                     video.DATA = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Video.Media.DATA));
                     video.DISPLAYNAME = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Video.Media.DISPLAY_NAME));
-                    video.LENGTH = getFormatedDuration(cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Video.Media.DURATION)));
+                    video.LENGTH = Utilities.getFormatedDuration(cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Video.Media.DURATION)));
                     videos.add(video);
                 }
                 return new ArrayList<>(videos);
@@ -39,14 +47,6 @@ public class VideoFetcher {
         }
 
         return new ArrayList<>();
-    }
-
-    private static String getFormatedDuration(String string) {
-        long length = Long.parseLong(string);
-        int temp = (int) (length / 1000);
-        int minutes = temp / 60;
-        int seconds = temp % 60;
-        return String.format("%02d : %02d", minutes, seconds);
     }
 
     @SuppressLint("InlinedApi")
@@ -60,4 +60,32 @@ public class VideoFetcher {
         return null;
     }
 
+    public static void fetchOnlineVideos(final OnFetchedListener onFetchedListener) {
+        TagsHelper tagsHelper = new TagsHelper();
+        final ArrayList<Video> videos = new ArrayList<>();
+        final ArrayList<String> tags = tagsHelper.getTagsFromDB();
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference();
+        final int[] count = {0};
+        for(String tag : tags){
+            tag = Utilities.getFormattedTag(tag);
+            Log.d("Hardik", "fetchOnlineVideos: "+tag);
+            reference.child(tag).addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    for(DataSnapshot ds : snapshot.getChildren()){
+                      if(ds.getKey()!=null && ds.getKey().startsWith("@")) videos.add(ds.getValue(Video.class));
+                    }
+                    count[0] += 1;
+                    if(tags.size() == count[0]){
+                        onFetchedListener.fetched(videos);
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+                    onFetchedListener.fetched(new ArrayList<Video>());
+                }
+            });
+        }
+    }
 }

@@ -1,9 +1,19 @@
 package com.media.intellisensemedia;
 
+import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+
+import android.app.PictureInPictureParams;
+import android.content.res.Configuration;
+import android.graphics.Point;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
+import android.util.Rational;
+import android.view.Display;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Toast;
@@ -55,6 +65,8 @@ public class ExoplayerActivity extends AppCompatActivity
     File cascadeFile;
     CascadeClassifier cascadeClassifier;
     Mat mat;
+    int secDelay = 1;
+    ActionBar actionBar;
 
     BaseLoaderCallback baseLoaderCallback = new BaseLoaderCallback(this) {
         @Override
@@ -98,10 +110,12 @@ public class ExoplayerActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
         setContentView(R.layout.activity_exoplayer);
+        actionBar = getSupportActionBar();
 
         if(getSupportActionBar().isShowing()){
             getSupportActionBar().hide();
@@ -127,6 +141,8 @@ public class ExoplayerActivity extends AppCompatActivity
 
         //  S E T U P    P L A Y E R
         setUp(getIntent().getStringExtra(VIDEO_URI));
+
+
 
     }
 
@@ -252,8 +268,18 @@ public class ExoplayerActivity extends AppCompatActivity
         mat.release();
     }
 
+    //5ms
+    //1000/5 - 200
     @Override
     public Mat onCameraFrame(CameraBridgeViewBase.CvCameraViewFrame inputFrame) {
+        Log.d("Hardik", "onCreate: "+Thread.activeCount());
+
+            try {
+                Thread.sleep(secDelay * 1000);
+            } catch (InterruptedException ignore) {
+
+            }
+
         mat = inputFrame.rgba();
         MatOfRect matOfRect = new MatOfRect();
         cascadeClassifier.detectMultiScale(mat, matOfRect);
@@ -285,6 +311,31 @@ public class ExoplayerActivity extends AppCompatActivity
         public static final int MIN_PLAYBACK_START_BUFFER = 1500;
         //Min video You want to buffer when user resumes video
         public static final int MIN_PLAYBACK_RESUME_BUFFER = 5000;
+    }
+
+
+
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    @Override
+    protected void onUserLeaveHint() {
+        Display display = getWindowManager().getDefaultDisplay();
+        Point size = new Point();
+        display.getSize(size);
+        int width = size.x;
+        int height = size.y;
+        Rational rational = new Rational(width, height);
+        PictureInPictureParams.Builder builder = new PictureInPictureParams.Builder();
+        builder.setAspectRatio(rational).build();
+        enterPictureInPictureMode(builder.build());
+
+    }
+
+    @Override
+    public void onPictureInPictureModeChanged(boolean isInPictureInPictureMode, Configuration newConfig) {
+        if (isInPictureInPictureMode)
+            actionBar.hide();
+        else
+            actionBar.show();
     }
 
 }

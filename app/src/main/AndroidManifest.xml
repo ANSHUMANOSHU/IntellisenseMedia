@@ -23,9 +23,11 @@
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
         <activity android:name=".FavouriteActivity"></activity>
-        <activity
-            android:name=".ExoplayerActivity"
-            android:screenOrientation="landscape" />
+        <activity android:name=".ExoplayerActivity"
+            android:screenOrientation="landscape"
+            android:supportsPictureInPicture="true"
+            android:resizeableActivity="true"
+            android:configChanges="screenSize|smallestScreenSize|screenLayout|orientation"/>
         <activity
             android:name=".MainActivity"
             android:screenOrientation="portrait">
